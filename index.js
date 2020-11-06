@@ -139,17 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentSlider = 0,
             interval;
 
+        sliderItems.forEach(() => {
+            const li = document.createElement('li');
+            li.classList.add('dot');
+            document.querySelector('.portfolio-dots').appendChild(li);
+            dot.push(li); 
+        })
 
-        const addDots = function() {
-            for(let i = 0; i < sliderItems.length; i++) {
-                const li = document.createElement('li');
-                li.classList.add('dot');
-                document.querySelector('.portfolio-dots').appendChild(li);
-                dot.push(li)
-            }
-            dot[0].classList.add('dot-active');
-        };
-        addDots();
+        dot[0].classList.add('dot-active');
 
         const prevSlide = function(elem, currentSlider, status) {
             elem[currentSlider].classList.remove(status);
@@ -241,6 +238,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     };
-
     sliderActions();
+
+    function anchorAction() {
+        const anchor = document.querySelectorAll('a[href*="#"]');
+
+        anchor.forEach(elem => elem.addEventListener('click', e => {
+            e.preventDefault();
+            const attr = elem.getAttribute('href');
+            document.querySelector(attr).scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            })
+        }))
+    }
+    anchorAction();
 })
