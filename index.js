@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const body = document.querySelector('body');
         const menu = document.querySelector('menu');
         body.addEventListener('click', e => {
+            e.preventDefault();
             const { target } = e;
 
             if (!target.closest('menu') && menu.closest('.active-menu') || target.closest('menu .close-btn') || target.closest('a')) {
