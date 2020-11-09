@@ -254,4 +254,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }))
     }
     anchorAction();
+
+    function teamBlock() {
+        const command = document.getElementById('command');
+        let tempSrc;
+ 
+        command.addEventListener('mouseover', (e) => {
+            const {target} = e;
+ 
+            if(target.matches('img')) {
+                tempSrc = target.src;
+                target.src = target.dataset.img;
+            }
+ 
+        })
+ 
+        command.addEventListener('mouseout', (e) => {
+            const {target} = e;
+            if(target.matches('img')) {
+                target.src = tempSrc;
+            }
+ 
+        })
+    }
+    teamBlock();
+ 
+    function calc() {
+        const calc = document.getElementById('calc');
+ 
+        calc.addEventListener('change', (e) => {
+            const {target} = e;
+ 
+            if(target.matches('input')) {
+                let regex = target.value.match(/\d/);
+                if(regex === null) {
+                    alert('Только цифры');
+                }
+            }
+        })
+    }
+    calc();
 })
