@@ -1,3 +1,5 @@
+const calcPrice = 100;
+
 document.addEventListener('DOMContentLoaded', () => {
     
         
@@ -279,9 +281,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     teamBlock();
  
-    function calc() {
-        const calc = document.getElementById('calc');
+    function calc(price = 100) {
+        const calc = document.getElementById('calc'),
+            totalValue = document.getElementById('total'),
+            calcType = calc.querySelector('.calc-type'),
+            calcCount = calc.querySelector('.calc-count'),
+            calcDay = calc.querySelector('.calc-day');
  
+        const countSum = () => {
+            let total = 0, 
+            countValue = 1,
+            dayValue = 1,
+            typeValue = calcType.options[calcType.selectedIndex].value,
+            squareValue = calc.querySelector('.calc-square').value;
+
+            if(calcCount.value > 1){
+                countValue += (calcCount.value - 1) / 10;
+            }
+            
+            if(calcDay.value && calcDay.value < 5) {
+                dayValue *= 2;
+            } else if(calcDay.value && calcDay.value < 10) {
+                dayValue *= 1.5;
+            }
+
+            if(typeValue && squareValue){
+                total = price * typeValue * squareValue * dayValue * countValue;
+                console.log(price);
+                console.log(typeValue);
+                console.log(squareValue);
+                console.log(dayValue);
+            }
+
+            totalValue.textContent = total;
+        };
+
         calc.addEventListener('change', (e) => {
             const {target} = e;
  
@@ -291,7 +325,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('Только цифры');
                 }
             }
+
+            if(target.matches('select') || target.matches('input')) {
+                countSum();
+            }
+            
         })
     }
-    calc();
+    calc(calcPrice);
 })
