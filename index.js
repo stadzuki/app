@@ -307,13 +307,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(typeValue && squareValue){
                 total = price * typeValue * squareValue * dayValue * countValue;
-                console.log(price);
-                console.log(typeValue);
-                console.log(squareValue);
-                console.log(dayValue);
             }
 
-            totalValue.textContent = total;
+            const counter = () => {
+                const timer = requestAnimationFrame(() => {
+                    totalValue.textContent = +totalValue.textContent + 1;
+                    if(+totalValue.textContent === total) {
+                        return cancelAnimationFrame(timer);
+                    } 
+                    counter();
+                })
+            }
+            counter();
         };
 
         calc.addEventListener('change', (e) => {
