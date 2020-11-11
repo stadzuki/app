@@ -307,29 +307,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(typeValue && squareValue){
                 total = price * typeValue * squareValue * dayValue * countValue;
+                console.log(total);
+                const counter = () => {
+                    const timer = requestAnimationFrame(() => {
+                        if(+totalValue.textContent === total) {
+                            return cancelAnimationFrame(timer);
+                        } 
+                        if(+totalValue.textContent > total) {
+                            totalValue.textContent = +totalValue.textContent - 1;
+                        } else {
+                            totalValue.textContent = +totalValue.textContent + 1;
+                        }
+                        counter();
+                    })
+                }
+                counter();
             }
 
-            const counter = () => {
-                const timer = requestAnimationFrame(() => {
-                    totalValue.textContent = +totalValue.textContent + 1;
-                    if(+totalValue.textContent === total) {
-                        return cancelAnimationFrame(timer);
-                    } 
-                    counter();
-                })
-            }
-            counter();
+            
         };
 
-        calc.addEventListener('change', (e) => {
+        calc.addEventListener('input', e => {
             const {target} = e;
  
             if(target.matches('input')) {
                 let regex = target.value.match(/\d/);
                 if(regex === null) {
+                    target.value = '';
                     alert('Только цифры');
                 }
             }
+        })
+
+        calc.addEventListener('change', (e) => {
+            const {target} = e;
 
             if(target.matches('select') || target.matches('input')) {
                 countSum();
