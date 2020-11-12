@@ -1,7 +1,6 @@
 const calcPrice = 100;
 
 document.addEventListener('DOMContentLoaded', () => {
-    
         
     function countTimer(deadline){
         let timerHours = document.querySelector('#timer-hours'),
@@ -48,23 +47,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     countTimer('5 november 2020');
 
-    function toggleMenu() {
-        const body = document.querySelector('body');
-        const menu = document.querySelector('menu');
-        body.addEventListener('click', e => {
-            e.preventDefault();
-            const { target } = e;
+    // function toggleMenu() {
+    //     const body = document.querySelector('body');
+    //     const menu = document.querySelector('menu');
 
-            if (!target.closest('menu') && menu.closest('.active-menu') || target.closest('menu .close-btn') || target.closest('a')) {
-                menu.classList.remove('active-menu');
-            }
-            if (target.closest('.menu')) {
-                menu.classList.add('active-menu');
-            }
-        });
-    }   
+    //     const handlerMenu = () => {
 
-    toggleMenu();
+    //         if (screen.width > 768) {
+    //             menu.classList.toggle('active-menu');
+    //         } else {
+    //             if (!menu.style.transform || menu.style.transform === `translate(-100%)`) {
+    //                 menu.style.transform = `translate(0)`;
+    //             } else {
+    //                 menu.style.transform = `translate(-100%)`;
+    //             }
+    //         }
+    //     };
+
+    //     body.addEventListener('click', e => {
+    //         e.preventDefault();
+    //         const { target } = e;
+
+    //         if (target.closest('div .menu')) {
+    //             handlerMenu();
+    //         } else if (target.classList.contains('close-btn') ||
+    //             target.closest('.active-menu li a')) {
+    //             handlerMenu();
+    //         } else if (menu.classList.contains('active-menu') && !target.classList.contains('active-menu')) {
+    //             handlerMenu();
+    //         }
+
+    //         // if (!target.closest('menu') && menu.closest('.active-menu') || target.closest('menu .close-btn') || target.closest('a')) {
+    //         //     menu.classList.remove('active-menu');
+    //         // }
+    //         // if (target.closest('.menu')) {
+    //         //     menu.classList.add('active-menu');
+    //         // }
+    //     });
+    // }   
+
+    // toggleMenu();
 
     function popupBlock() {
         const popup = document.querySelector('.popup'),
@@ -120,16 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(item.textContent === 'Дизайн экстерьера') serviceTab[1].style.display = 'flex';
             if(item.textContent === 'Визуальная анимация') serviceTab[2].style.display = 'flex';
         }))
-
-        // tabItem[0].parentNode.addEventListener('click', e => {
-        //     reset();
-        //     const {target} = e;
-        //     // target.classList.toggle('active');
-            
-        //     if(target.matches('span')) target.classList.toggle('active');
-
-        //     // console.log(target.closest('.service-header-tab').textContent);
-        // })
     }
     
     servicesTab();
@@ -258,26 +270,17 @@ document.addEventListener('DOMContentLoaded', () => {
     anchorAction();
 
     function teamBlock() {
-        const command = document.getElementById('command');
-        let tempSrc;
- 
-        command.addEventListener('mouseover', (e) => {
-            const {target} = e;
- 
-            if(target.matches('img')) {
-                tempSrc = target.src;
-                target.src = target.dataset.img;
-            }
- 
-        })
- 
-        command.addEventListener('mouseout', (e) => {
-            const {target} = e;
-            if(target.matches('img')) {
-                target.src = tempSrc;
-            }
- 
-        })
+        const allImg = document.querySelectorAll("img[data-img]");
+        let src;
+        allImg.forEach(item => {
+            item.addEventListener("mouseover", event => {
+                src = event.target.getAttribute("src");
+                event.target.src = event.target.dataset.img;
+            });
+            item.addEventListener("mouseout", event => {
+                event.target.src = src;
+            });
+        });
     }
     teamBlock();
  
@@ -345,4 +348,93 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
     calc(calcPrice);
+
+    function postData(data, successNotif, failedNotif) {
+        const request = new XMLHttpRequest();
+
+        request.addEventListener('readystatechange', () => {
+            if(request.readyState !== 4) return;
+
+            if(request.status === 200) {
+                successNotif();
+            } else {
+                failedNotif(request.status)
+            }
+        });
+
+        request.open('POST', './server.php');
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.send(JSON.stringify(data));
+    }
+
+    function isValid(target) {
+        let status = true,
+            test;
+        target.forEach(key => {
+            if(key.type === 'tel') {
+                test = /^(\+{1})(\d+)$/.test(key.value);
+                if(!test) {
+                    status = false; 
+                    console.log('--');
+                }
+            }
+            if(key.type === 'text') {
+                test = /[А-я](\s?)/.test(key.value);
+                if(!test) {
+                    status = false; 
+                }
+            }
+        })
+        return status;
+    }
+
+    function postForm(selector) {
+        const form = document.getElementById(selector);
+        const inputs = form.querySelectorAll('input');
+
+        const notification = document.createElement('div'),
+            loadNotif = 'Загрузка...',
+            successNotif = 'Заявка успешно доставлена!',
+            failedNotif = 'Ошибка! Нет ответа от сервера!';
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const status = isValid(inputs);
+            if(!status) return;
+
+            const preloader = document.querySelector('.preloader-inner');
+            preloader.classList.add('preloader-active');
+
+            form.appendChild(notification);
+            notification.textContent = loadNotif;
+
+            const formData = new FormData(form),
+                data = {};
+
+            formData.forEach((key, index) => {
+                data[index] = key
+            });
+
+            postData(data, () => {
+                notification.textContent = successNotif;
+                form.reset();
+                preloader.classList.remove('preloader-active');
+            }, (error) => {
+                notification.textContent = failedNotif;
+                console.error(error);
+            });
+        })
+    }
+
+    function getForms() {
+        const forms = document.querySelectorAll('form');
+
+        forms.forEach(elem => {
+            postForm(elem.id);
+        })
+    }
+    getForms();
+    
+
 })
