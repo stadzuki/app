@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let timer = getTimeRemaining();
             if(!timer) {
                 clearInterval(intervalTimer);
-                // alert('Акцуха прошла ПАРЕНЬ!!!');
                 timerHours.textContent = '00';
                 timerMinutes.textContent = '00';
                 timerSeconds.textContent = '00';
@@ -285,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     teamBlock();
  
     function calc(price = 100) {
+
         const calc = document.getElementById('calc'),
             totalValue = document.getElementById('total'),
             calcType = calc.querySelector('.calc-type'),
@@ -300,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(calcCount.value > 1){
                 countValue += (calcCount.value - 1) / 10;
+                console.log(countValue);
             }
             
             if(calcDay.value && calcDay.value < 5) {
@@ -309,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if(typeValue && squareValue){
-                total = price * typeValue * squareValue * dayValue * countValue;
+                total = Math.floor(price * typeValue * squareValue * dayValue * countValue);
                 console.log(total);
                 const counter = () => {
                     const timer = requestAnimationFrame(() => {
@@ -375,7 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 test = /^(\+{1})(\d+)$/.test(key.value);
                 if(!test) {
                     status = false; 
-                    console.log('--');
                 }
             }
             if(key.type === 'text') {
