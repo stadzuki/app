@@ -331,11 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const {target} = e;
  
             if(target.matches('input')) {
-                let regex = target.value.match(/\d/);
-                if(regex === null) {
-                    target.value = '';
-                    alert('Только цифры');
-                }
+                target.value = target.value.replace(/[a-zA-ZА-Яа-я]|\s/, '');
             }
         })
 
