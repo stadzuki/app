@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(key.type === 'tel') {
                 test = /^(\+{1})(\d+)$/.test(key.value);
                 if(!test) {
-                    status = false; 
+                    status = false;
                 }
             }
             if(key.type === 'text') {
@@ -385,6 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         })
+        if(!test) alert('Форма заполняется неверно!');
         return status;
     }
 
@@ -396,12 +397,13 @@ document.addEventListener('DOMContentLoaded', () => {
             loadNotif = 'Загрузка...',
             successNotif = 'Заявка успешно доставлена!',
             failedNotif = 'Ошибка! Нет ответа от сервера!';
+            notification.style.color = 'red';
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
             const status = isValid(inputs);
-            if(!status) return;
+            if(!status) return alert('Форма заполнена неверно!');
 
             const preloader = document.querySelector('.preloader-inner');
             preloader.classList.add('preloader-active');
