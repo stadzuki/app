@@ -311,16 +311,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(typeValue && squareValue){
                 total = Math.floor(price * typeValue * squareValue * dayValue * countValue);
-                console.log(total);
+
                 const counter = () => {
                     const timer = requestAnimationFrame(() => {
-                        if(+totalValue.textContent === total) {
-                            return cancelAnimationFrame(timer);
-                        } 
                         if(+totalValue.textContent > total) {
-                            totalValue.textContent = +totalValue.textContent - 1;
-                        } else {
+                            totalValue.textContent = 0;
+                        } else if(+totalValue.textContent < total) {
                             totalValue.textContent = +totalValue.textContent + 1;
+                        }
+                        if(+totalValue.textContent === total) {
+                            return cancelAnimationFrame(timer); 
                         }
                         counter();
                     })
@@ -350,22 +350,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     calc(calcPrice);
 
-    function postData(data, successNotif, failedNotif) {
-        const request = new XMLHttpRequest();
+    function postData(data) {/* Непосредственно promise */
+        return new Promise((resolve, reject) => {
+            const request = new XMLHttpRequest();
 
-        request.addEventListener('readystatechange', () => {
-            if(request.readyState !== 4) return;
+            request.addEventListener('readystatechange', () => {
+                if(request.readyState !== 4) return;
 
-            if(request.status === 200) {
-                successNotif();
-            } else {
-                failedNotif(request.status)
-            }
+                if(request.status === 200) {
+                    // successNotif();
+                    resolve();
+                } else {
+                    // failedNotif(request.status)
+                    reject(request.status);
+                }
+            });
+
+            request.open('POST', './server.php');
+            request.setRequestHeader('Content-Type', 'application/json');
+            request.send(JSON.stringify(data));  
         });
-
-        request.open('POST', './server.php');
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.send(JSON.stringify(data));
     }
 
     function isValid(target) {
@@ -389,13 +393,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return status;
     }
 
-    function postForm(selector) {
+    function postForm(selector) {/* Обработка promise */
         const form = document.getElementById(selector);
         const inputs = form.querySelectorAll('input');
 
         const notification = document.createElement('div'),
             loadNotif = 'Загрузка...',
             successNotif = 'Заявка успешно доставлена!',
+
+            // const successNotif = () => {
+            //     notification.textContent = 'Заявка успешно доставлена!';
+            //     form.reset();
+            //     preloader.classList.remove('preloader-active');
+            // }
+
             failedNotif = 'Ошибка! Нет ответа от сервера!';
             notification.style.color = 'red';
 
@@ -418,14 +429,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 data[index] = key
             });
 
-            postData(data, () => {
-                notification.textContent = successNotif;
-                form.reset();
-                preloader.classList.remove('preloader-active');
-            }, (error) => {
-                notification.textContent = failedNotif;
-                console.error(error);
-            });
+            // postData(data, () => {
+            //     notification.textContent = successNotif;
+            //     form.reset();
+            //     preloader.classList.remove('preloader-active');
+            // }, (error) => {
+            //     notification.textContent = failedNotif;
+            //     console.error(error);
+            // });
+
+            postData(data)
+                .then(() => notification.textContent = successNotif)
+                .catch(error => {
+                    notification.textContent = failedNotif;
+                    console.error(error);
+                })
+                .finally(() => {
+                    form.reset();
+                    preloader.classList.remove('preloader-active');
+                })
+
         })
     }
 
