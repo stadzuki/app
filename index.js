@@ -350,7 +350,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     calc(calcPrice);
 
-    function postData(data) {/* Непосредственно promise */
+    function postData(data) {
+        
+        return fetch('./server.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+            credentials: 'include'
+        });
+        
+        /* Непосредственно promise */
         return new Promise((resolve, reject) => {
             const request = new XMLHttpRequest();
 
@@ -439,7 +450,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // });
 
             postData(data)
-                .then(() => notification.textContent = successNotif)
+                .then((response) => {
+                    if(response.status !== 200) {
+                        throw new Error('network status not 200')
+                    }
+                    notification.textContent = successNotif
+                })
                 .catch(error => {
                     notification.textContent = failedNotif;
                     console.error(error);
